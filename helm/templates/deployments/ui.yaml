@@ -69,7 +69,7 @@ spec:
           value: https://s3.{{ .Values.global.hostname }}
         {{- else }}
         - name: OPEN_BALENA_S3_URL
-          value: https://{{ .Values.global.s3.server }}
+          value: {{ .Values.global.s3.protocol | default "https" }}://{{ .Values.global.s3.server }}
         {{- end }}
         - name: OPEN_BALENA_S3_ACCESS_KEY
           valueFrom:

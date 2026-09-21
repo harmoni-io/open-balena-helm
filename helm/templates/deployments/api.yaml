@@ -166,7 +166,7 @@ spec:
           value: "s3.{{ .Values.global.hostname }}"
         {{- else }}
         - name: IMAGE_STORAGE_ENDPOINT
-          value: "{{ .Values.global.s3.server }}"
+          value: "{{ if .Values.global.s3.protocol }}{{ .Values.global.s3.protocol }}://{{ end }}{{ .Values.global.s3.server }}"
         {{- end }}
         - name: IMAGE_STORAGE_BUCKET
           value: "{{ index .Values "global" "s3" "imageBucket" }}"

@@ -95,7 +95,7 @@ spec:
           value: "https://s3.{{ .Values.global.hostname }}"
         {{- else }}
         - name: REGISTRY2_S3_REGION_ENDPOINT
-          value: "https://{{ .Values.global.s3.server }}"
+          value: "{{ .Values.global.s3.protocol | default "https" }}://{{ .Values.global.s3.server }}"
         {{- end }}
         - name: REGISTRY2_S3_BUCKET
           value: "{{ .Values.global.s3.registryBucket }}"

@@ -32,6 +32,10 @@ spec:
       {{- end }}
   template:
     metadata:
+      {{- with .Values.vpn.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
         {{- include "openbalena.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: vpn
