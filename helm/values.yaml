@@ -50,6 +50,11 @@ global:
     server:
     port: 6379
     clusterMode: false
+    # Redis ACL credentials for the api (REDIS_AUTH, "user:password" or "password"), read from an existing
+    # Secret; unset sends no auth.
+    auth:
+      existingSecret: ""
+      existingSecretKey: auth
 
   keys:
     cookie-secret:

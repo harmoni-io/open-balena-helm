@@ -213,6 +213,13 @@ spec:
           value: "{{ .Values.global.redis.server }}:{{ .Values.global.redis.port }}"
         - name: REDIS_IS_CLUSTER
           value: "{{ .Values.global.redis.clusterMode }}"
+        {{- if .Values.global.redis.auth.existingSecret }}
+        - name: REDIS_AUTH
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.redis.auth.existingSecret }}
+              key: {{ .Values.global.redis.auth.existingSecretKey | default "auth" }}
+        {{- end }}
         {{- end}}
         {{- if .Values.global.loki.server }}
         - name: LOKI_HOST
