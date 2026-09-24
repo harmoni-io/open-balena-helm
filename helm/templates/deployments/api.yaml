@@ -42,19 +42,22 @@ spec:
       priorityClassName: {{ . | quote }}
       {{- end }}
       initContainers:
+      # The api image carries openssl and coreutils: no runtime apt, and a failed pipeline fails the pod instead
+      # of leaving an empty key ID. First 30 bytes of the SHA-256 digest = the former sha256sum | head -c 60 | xxd -r -p.
       - name: generate-api-kid
-        image: ubuntu:22.04
+        image: {{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}
         volumeMounts:
         - mountPath: /cert-api
           name: cert-api
         - mountPath: /cert-api-kid
           name: cert-api-kid
         command:
-        - /bin/bash
+        - /usr/bin/bash
         - -c
         - >
-          apt-get update && apt-get install -y openssl xxd;
-          openssl ec -pubout -outform der -in /cert-api/private_key | sha256sum | head -c 60 | xxd -r -p | base32 | fold -w4 | paste -sd : | tr -d '\n' > /cert-api-kid/api_kid
+          set -eo pipefail;
+          openssl ec -pubout -outform der -in /cert-api/private_key | openssl dgst -sha256 -binary | head -c 30 | base32 | fold -w4 | paste -sd : | tr -d '\n' > /cert-api-kid/api_kid;
+          test -s /cert-api-kid/api_kid
       {{- if .Values.db.enabled }}
       - name: wait-for-db
         image: postgres:12
@@ -74,7 +77,7 @@ spec:
           done
       {{- end }}
       - name: generate-options
-        image: ubuntu:22.04
+        image: {{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}
         volumeMounts:
         - mountPath: /options
           name: options
