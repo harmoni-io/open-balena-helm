@@ -146,6 +146,9 @@ registry:
 
   disableRedirect: false
   disableUploadPurging: true
+  # Install cron (weekly garbage-collect) and rsyslog (journal relay to global.promtail.server) with apt at every
+  # container start. Off: the postStart hook only links the certificates; the registry logs to stdout either way.
+  runtimePackages: true
 
   labels: {}
   annotations: {}

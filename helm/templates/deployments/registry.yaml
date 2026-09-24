@@ -163,6 +163,7 @@ spec:
                   ln -s /certs/api/certificate /certs/private/api.{{ .Values.global.hostname }}.pem;
                   ln -s /certs/api/private_key /certs/private/api.{{ .Values.global.hostname }}.key;
                   openssl ec -pubout -outform der -in /certs/api/private_key | sha256sum | head -c 60 | xxd -r -p | base32 | fold -w4 | paste -sd : | tr -d '\n' > /certs/private/api.{{ .Values.global.hostname }}.kid;
+                  {{- if .Values.registry.runtimePackages }}
                   apt-get update; apt-get install -y --no-install-recommends cron rsyslog; apt-get clean; rm -rf /var/lib/apt/lists/*;
                   echo "0 20 * * 6 /usr/local/bin/docker-registry garbage-collect /etc/docker-registry.yml -m" > /etc/cron.d/registry-garbage-collect;
                   chmod 0644 /etc/cron.d/registry-garbage-collect;
@@ -172,6 +173,7 @@ spec:
                     echo 'module(load="imjournal")\nmodule(load="mmjsonparse")\n$imjournalRatelimitInterval 0\n$imjournalRatelimitBurst 0\n*.* action(type="omfwd" Target="{{ .Values.global.promtail.server }}" Port="{{ .Values.global.promtail.port }}" Protocol="tcp" Template="RSYSLOG_SyslogProtocol23Format" TCP_Framing="octet-counted")' > /etc/rsyslog.d/00-promtail-relay.conf; 
                     /usr/sbin/rsyslogd;
                   fi;
+                  {{- end }}
       volumes:
       - name: run
         emptyDir:
